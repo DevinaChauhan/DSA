@@ -1,0 +1,84 @@
+
+    #include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+// Node definition
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+struct Node* hasLoop(struct Node* head) {
+    struct Node* slow = head;
+    struct Node* fast = head;
+
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;
+        fast = fast->next->next;
+
+        if (slow == fast) {
+            return slow; // Loop detected, returning the intersection node
+        }
+    }
+
+    return NULL; // No loop found
+}
+
+// Function to detect and return the starting node of a loop
+struct Node* findLoopStart(struct Node* head) {
+    if (head == NULL)
+        return NULL;
+
+    struct Node* intersection = hasLoop(head);
+    struct Node* slow = head;
+
+    while (slow != intersection) {
+        slow = slow->next;
+        intersection = intersection->next;
+    }
+
+    return slow;
+}
+
+void removeLoop(struct Node* head, struct Node* loopStart) {
+    struct Node* ptr1 = loopStart;
+    struct Node* ptr2 = loopStart;
+
+    while (ptr2->next != ptr1 && ptr2->next != loopStart) {
+        ptr2 = ptr2->next;
+    }
+
+    ptr2->next = NULL;
+}
+
+int main() {
+    struct Node* head = (struct Node*)malloc(sizeof(struct Node));
+    head->data = 1;
+    head->next = (struct Node*)malloc(sizeof(struct Node));
+    head->next->data = 2;
+    head->next->next = (struct Node*)malloc(sizeof(struct Node));
+    head->next->next->data = 3;
+    head->next->next->next = (struct Node*)malloc(sizeof(struct Node));
+    head->next->next->next->data = 4;
+    head->next->next->next->next = head->next; // Creating a loop
+
+    struct Node* loopStart = findLoopStart(head);
+
+    if (loopStart != NULL) {
+        printf("The starting node of the loop is %d.\n", loopStart->data);
+        removeLoop(head, loopStart);
+        printf("The loop has been removed.\n");
+    } else {
+        printf("The linked list does not have a loop.\n");
+    }
+
+    // Remember to free the allocated memory to avoid memory leaks
+    free(head->next->next->next);
+    free(head->next->next);
+    free(head->next);
+    free(head);
+
+    return 0;
+}
+
