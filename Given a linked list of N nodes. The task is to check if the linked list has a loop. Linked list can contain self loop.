@@ -1,0 +1,57 @@
+#include <iostream>
+#include <map>
+using namespace std;
+
+// Node definition
+struct Node {
+    int data;
+    Node* next;
+};
+
+bool hasLoop(Node* head) {
+    map<Node*, bool> visited;
+
+    Node* current = head;
+
+    while (current != nullptr) {
+        // If current node is already visited, there is a loop
+        if (visited.find(current) != visited.end()) {
+            return true;
+        }
+
+        // Mark current node as visited
+        visited[current] = true;
+
+        // Move to the next node
+        current = current->next;
+    }
+
+    // If end of list is reached, there is no loop
+    return false;
+}
+
+int main() {
+    // Example usage
+    Node* head = new Node{1, nullptr};
+    head->next = new Node{2, nullptr};
+    head->next->next = new Node{3, nullptr};
+    head->next->next->next = new Node{4, nullptr};
+    head->next->next->next->next = head->next; // Creating a loop
+
+    bool result = hasLoop(head);
+
+    if (result) {
+        cout << "The linked list has a loop." << endl;
+    } else {
+        cout << "The linked list does not have a loop." << endl;
+    }
+
+    // Remember to free the allocated memory to avoid memory leaks
+    delete head->next->next->next->next;
+    delete head->next->next->next;
+    delete head->next->next;
+    delete head->next;
+    delete head;
+
+    return 0;
+}
